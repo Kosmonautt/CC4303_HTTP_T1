@@ -42,20 +42,31 @@ def parse_HTTP_message(http_message):
     lines = []
     # almacena la linea que estamos leyendo
     current_line = ''
-    # para cada character en el mesnaje
-    for c in http_message:
-        # si es un salto de línea
-        if c == '\n':
-            # metemos a la lista 
+
+    mssg_len = len(http_message)
+
+    i = 0
+
+    while i < mssg_len:
+        # si se llega a un fin de una línea
+        if http_message[i] == '\r':
+            # el carácter que viene después es '\n' así 
+            # que se salta
+            i += 2
+            # se agrega a la lista
             lines.append(current_line)
+            # se borra la current line
             current_line = ''
+            # si hay otra '\r' después de '\n' se está al final del HEAD
+            if http_message[i] == '\r':
+                break
         else:
-            # hacemos el string más largo
-            current_line += c
-
-    print(lines)
-
-
+            # se agrega el carácter al string
+            current_line += http_message[i]
+            i += 1
+    
+    for s in lines:
+        print(s)
 
 
 
