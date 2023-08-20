@@ -36,6 +36,25 @@ def remove_end_of_message(full_message, end_sequence):
     index = full_message.rfind(end_sequence)
     return full_message[:index]
 
+# esta función divide un string por el primer carácter ":" que encuentra
+def divide_by_colon(texto):
+    # se divide por el ":"
+    texto = texto.split(":")
+
+    # la primera parte del texto antes del :
+    texto_1 = texto[0]
+
+    # todos después del primer :
+    texto_2 = ''
+
+    for i in range(1, len(texto)):
+        texto_2 += texto[i]
+        # si no es el ultimo, se agrega el :
+        if(i+1 != len(texto)):
+            texto_2 += ":"
+    
+    return texto_1, texto_2
+
 # esta función sirve para transformar el mensaje en una estrutura fácil de manejar
 def parse_HTTP_message(http_message):
     # se crea una lista para almacenar cada línea
@@ -79,13 +98,20 @@ def parse_HTTP_message(http_message):
     for i in range(1, len_lines):
         # linea
         line = lines[i]
-        # linea dividida por :
-        # CORREGIR
-        line = line.split(':')
+        # # linea es dividida por :
+        # # corregir!!!
+        # line = line.split(':')
 
-        # se guardan las líneas
-        line_atribute = line[0].strip()
-        line_content = line[1].strip()
+        # # se guardan las líneas
+        # line_atribute = line[0]
+        # line_content = line[1]
+
+        # se divide la línea por el primer ":"
+        divided_by_colon = divide_by_colon(line)
+
+        # se consigue las dos partes del string
+        line_atribute = divided_by_colon[0]
+        line_content = divided_by_colon[1].strip()
 
         # se formatea el mensaje con forma de json
         if(i+1 == len_lines):
@@ -159,9 +185,13 @@ result = parse_HTTP_message(message.decode())
 
 new_HTTP_message = create_HTTP_message(result)
 
+# print("Mensaje original: \n")
+# print(message.decode())
+
+# print("Mensaje parseado: \n")
 # print(new_HTTP_message)
 
-print(message.decode())
+print(message.decode() == new_HTTP_message)
 
 # se cierra la conexión con el socket
 new_socket.close()
