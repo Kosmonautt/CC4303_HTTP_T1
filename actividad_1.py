@@ -80,6 +80,7 @@ def parse_HTTP_message(http_message):
         # linea
         line = lines[i]
         # linea dividida por :
+        # CORREGIR
         line = line.split(':')
 
         # se guardan las líneas
@@ -103,8 +104,27 @@ def parse_HTTP_message(http_message):
     # se retorna la primer línea y el json con los atributos
     return (first_line, info_json) 
 
+# esta función toma la estructura y la retorna como un mensaje HTTP
+def create_HTTP_message(sctructure):
+    # linea con GET/POST
+    first_line = sctructure[0]
+    # json con atributos
+    json = sctructure[1]
+    
+    # mensaje HTTP, inicialmente vacío
+    HHTP_message = ''
 
+    HHTP_message += first_line + "\n"
 
+    # atributos del json
+    atributes = json["atributos"][0]
+
+    for key, value in atributes.items():
+        HHTP_message += key + ": " + value + "\n"
+    
+    HHTP_message += "\n"
+
+    return HHTP_message
 
 
 
@@ -136,6 +156,10 @@ message = new_socket.recv(buff_size)
 # guardamos el resultado del mensaje
 
 result = parse_HTTP_message(message.decode())
+
+new_HTTP_message = create_HTTP_message(result)
+
+# print(new_HTTP_message)
 
 print(message.decode())
 
