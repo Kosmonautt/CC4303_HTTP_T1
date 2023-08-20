@@ -109,6 +109,8 @@ def parse_HTTP_message(http_message):
 
 
 
+
+
 # tamaño del buffer del server
 buff_size = 1024
 
@@ -135,7 +137,7 @@ message = new_socket.recv(buff_size)
 
 result = parse_HTTP_message(message.decode())
 
-print(result[1])
+print(message.decode())
 
 # se cierra la conexión con el socket
 new_socket.close()
