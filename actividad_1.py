@@ -140,15 +140,15 @@ def create_HTTP_message(sctructure):
     # mensaje HTTP, inicialmente vacío
     HHTP_message = ''
 
-    HHTP_message += first_line + "\n"
+    HHTP_message += first_line + "\r\n"
 
     # atributos del json
     atributes = json["atributos"][0]
 
     for key, value in atributes.items():
-        HHTP_message += key + ": " + value + "\n"
+        HHTP_message += key + ": " + value + "\r\n"
     
-    HHTP_message += "\n"
+    HHTP_message += "\r\n"
 
     return HHTP_message
 
@@ -190,6 +190,10 @@ new_HTTP_message = create_HTTP_message(result)
 
 # print("Mensaje parseado: \n")
 # print(new_HTTP_message)
+
+# print(len(message.decode()))
+# print('\n')
+# print(len(new_HTTP_message))
 
 print(message.decode() == new_HTTP_message)
 
