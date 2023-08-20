@@ -65,8 +65,46 @@ def parse_HTTP_message(http_message):
             current_line += http_message[i]
             i += 1
     
-    for s in lines:
-        print(s)
+    # linea co el GET/POST
+    first_line = lines[0]
+
+    # lineas con atributos en formato json 
+    info_json = '''{ 
+        "atributos": [ 
+            { 
+    '''
+
+    len_lines = len(lines)
+
+    for i in range(1, len_lines):
+        # linea
+        line = lines[i]
+        # linea dividida por :
+        line = line.split(':')
+
+        # se guardan las líneas
+        line_atribute = line[0].strip()
+        line_content = line[1].strip()
+
+        # se formatea el mensaje con forma de json
+        if(i+1 == len_lines):
+            line_string = '"' + line_atribute + '":"' + line_content + '"\n'
+        else:
+            line_string = '"' + line_atribute + '":"' + line_content + '", \n'
+        info_json += line_string
+    
+    info_json += ''' }
+     ]
+    } '''
+
+    # se pasa de strings a formato json (diccionario de python)
+    info_json = json.loads(info_json)
+
+    # se retorna la primer línea y el json con los atributos
+    return (first_line, info_json) 
+
+
+
 
 
 
@@ -93,7 +131,11 @@ new_socket, new_adress = server_socket.accept()
 # recibimos el mensaje (en bytes)
 message = new_socket.recv(buff_size)
 
-parse_HTTP_message(message.decode())
+# guardamos el resultado del mensaje
+
+result = parse_HTTP_message(message.decode())
+
+print(result[1])
 
 # se cierra la conexión con el socket
 new_socket.close()
