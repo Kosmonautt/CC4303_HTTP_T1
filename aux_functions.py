@@ -155,7 +155,8 @@ def create_HTML_HTTP(HTML_message):
     
     info_json += '''",
                 "Connection": " keep-alive",
-                "Access-Control-Allow-Origin": " *"
+                "Access-Control-Allow-Origin": " *",
+                "X-ElQuePregunta": " Benjamín"
             }
         ]
     }'''
