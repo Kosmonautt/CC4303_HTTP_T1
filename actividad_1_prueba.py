@@ -62,7 +62,11 @@ def parse_HTTP_message(http_message):
     # almacena la linea que estamos leyendo
     current_line = ''
 
+    # largo del mensaje HTTP
     mssg_len = len(http_message)
+
+    # mensaje html (si es que tiene)
+    html_message = ''
 
     i = 0
 
@@ -78,7 +82,16 @@ def parse_HTTP_message(http_message):
             current_line = ''
             # si hay otra '\r' después de '\n' se está al final del HEAD
             if http_message[i] == '\r':
-                break
+                # se avanza hasta el \n
+                i +=1
+                # si se llega al final del string, entonces no hay mensaje HTML
+                if i+1 == mssg_len:
+                    break
+                else:
+                    # se guara el mensaje html
+                    while i < html_message:
+                        html_message += http_message[i]
+                        i+=1
         else:
             # se agrega el carácter al string
             current_line += http_message[i]
@@ -98,13 +111,6 @@ def parse_HTTP_message(http_message):
     for i in range(1, len_lines):
         # linea
         line = lines[i]
-        # # linea es dividida por :
-        # # corregir!!!
-        # line = line.split(':')
-
-        # # se guardan las líneas
-        # line_atribute = line[0]
-        # line_content = line[1]
 
         # se divide la línea por el primer ":"
         divided_by_colon = divide_by_colon(line)
@@ -128,7 +134,7 @@ def parse_HTTP_message(http_message):
     info_json = json.loads(info_json)
 
     # se retorna la primer línea y el json con los atributos
-    return (first_line, info_json) 
+    return (first_line, info_json, html_message) 
 
 # esta función toma la estructura y la retorna como un mensaje HTTP
 def create_HTTP_message(sctructure):
