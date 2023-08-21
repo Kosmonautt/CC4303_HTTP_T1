@@ -174,7 +174,7 @@ def create_HTTP_message(sctructure):
     return HHTP_message
 
 # esta función toma un texto HTML y crea un mensaje HTTP adecuado 
-def create_HTML_HTTP(HTML_message):
+def create_HTML_HTTP(HTML_message, name=None):
     # linea con POST
     first_line = 'HTTP/1.1 200 OK'
 
@@ -192,13 +192,26 @@ def create_HTML_HTTP(HTML_message):
     
     info_json += len_HTML
     
-    info_json += '''",
-                "Connection": " keep-alive",
-                "Access-Control-Allow-Origin": " *",
-                "X-ElQuePregunta": " Benjamín"
-            }
-        ]
-    }'''
+    if name:
+        info_json += '''",
+                    "Connection": " keep-alive",
+                    "Access-Control-Allow-Origin": " *",
+                    "X-ElQuePregunta": "'''
+
+        info_json += name
+        
+        info_json+='''"
+                }
+            ]
+        }'''
+    else:
+        info_json += '''",
+            "Connection": " keep-alive",
+            "Access-Control-Allow-Origin": " *"
+                }
+            ]
+        }'''
+
 
     # se pasa de strings a formato json (diccionario de python)
     info_json = json.loads(info_json)
