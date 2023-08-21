@@ -126,15 +126,12 @@ def create_HTTP_message(sctructure):
     # última linea del HEAD
     HHTP_message += "\r\n"
 
-    print(HTML_message)
-
     # si tiene el atributo de content length
     if 'Content-Length' in atributes.keys():
-        len_HTML = int(atributes['Content-Length'])
-        # ahora mensaje HTML (si es que tiene)
-        print(len_HTML)
-        print(len(HTML_message.encode()))
-        for i in range(0, min(len_HTML, len(HTML_message))):
+        # se saca el largo del mensaje en bytes
+        len_HTML = len(HTML_message)
+        # se recorre el mensaje
+        for i in range(0, len_HTML):
             HHTP_message += HTML_message[i]
     return HHTP_message
 
@@ -192,7 +189,7 @@ Access-Control-Allow-Origin: *\r
 # crea un nuevo socket 
 # new_socket, new_adress = server_socket.accept()
 
-print(message2 == create_HTTP_message(parse_HTTP_message(message2)))
+print(message == create_HTTP_message(parse_HTTP_message(message)))
 
 # recibimos el mensaje (en bytes)
 #message = new_socket.recv(buff_size)
