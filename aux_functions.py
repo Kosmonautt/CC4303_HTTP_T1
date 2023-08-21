@@ -138,18 +138,11 @@ def create_HTTP_message(sctructure):
 def create_HTML_HTTP(HTML_message):
     # linea con POST
     first_line = 'HTTP/1.1 200 OK'
-    # json/diccionario con atributos
-    dicc = {}
 
-    dicc['Server'] = ' localhost'
-    dicc['Date'] = ' Sun, 20 Aug 2023 21:04:28 GMT'
-    dicc['Content-Type'] = ' text/html; charset=utf-8'
-    dicc['Content-Length'] = str(len(HTML_message.encode()))
-    dicc['Connection'] = ' keep-alive'
-    dicc['Access-Control-Allow-Origin'] = ' *'
-
+    # se saca el largo del HTML
     len_HTML = str(len(HTML_message.encode()))
 
+    # json con los atributos
     info_json = '''{
         "atributos": [
             {
@@ -173,16 +166,6 @@ def create_HTML_HTTP(HTML_message):
     # se crea la estrucutra
     strcuture = (first_line, info_json, HTML_message)
     
-    # # mensaje HTTP, inicialmente vacío
-    # HTTP_message = ''
 
-    # HTTP_message += first_line + "\r\n"
-
-    # for key, value in dicc.items():
-    #     HTTP_message += key + ": " + value + "\r\n"
-    
-    # HTTP_message += "\r\n"
-
-    # HTTP_message += HTML_message
-
+    # se retorna el mensaje ya creado
     return create_HTTP_message(strcuture)
