@@ -55,7 +55,7 @@ def parse_HTTP_message(http_message):
                 else:
                     # se salta el \n
                     i+=1
-                    # se guara el mensaje html
+                    # se guarda el mensaje html
                     while i < mssg_len:
                         html_message += http_message[i]
                         i+=1
@@ -103,6 +103,37 @@ def parse_HTTP_message(http_message):
     # se retorna la primer línea y el json con los atributos
     return (first_line, info_json, html_message) 
 
+# esta función toma la estructura y la retorna como un mensaje HTTP
+def create_HTTP_message(sctructure):
+    # linea con GET/POST
+    first_line = sctructure[0]
+    # json con atributos
+    json = sctructure[1]
+    # mensaje HTML (si es que tiene)
+    HTML_message = sctructure[2]
+    
+    # mensaje HTTP, inicialmente vacío
+    HHTP_message = ''
+
+    HHTP_message += first_line + "\r\n"
+
+    # atributos del json
+    atributes = json["atributos"][0]
+
+    for key, value in atributes.items():
+        HHTP_message += key + ": " + value + "\r\n"
+    
+    # última linea del HEAD
+    HHTP_message += "\r\n"
+
+    # si tiene el atributo de content length
+    if 'Content-Length' in atributes.keys():
+        len_HTML = int(atributes['Content-Length'])
+        # ahora mensaje HTML (si es que tiene)
+        for i in range(0, min(len_HTML, len(HTML_message))):
+            HHTP_message += HTML_message[i]
+    return HHTP_message
+
 message = '''GET / HTTP/1.1\r
 Host: localhost:8000\r
 User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0\r
@@ -139,32 +170,32 @@ Access-Control-Allow-Origin: *\r
 </html>'''
 
 # # tamaño del buffer del server
-# buff_size = 1024
+#buff_size = 1024
 
 # # dirección del socket server
-# server_adress = ('localhost', 8000)
+#server_adress = ('localhost', 8001)
 
 # # se crea el server
-# server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # # se le hace bind a la dirección especificada 
-# server_socket.bind(server_adress)
+#server_socket.bind(server_adress)
 
 # # el server puede escuchar solo una request a la vez
-# server_socket.listen(1)
+#server_socket.listen(1)
 
-# # se espera una request, cuando se recibe se 
-# # crea un nuevo socket 
+# se espera una request, cuando se recibe se 
+# crea un nuevo socket 
 # new_socket, new_adress = server_socket.accept()
 
-# # recibimos el mensaje (en bytes)
-# message = new_socket.recv(buff_size)
+print(message == create_HTTP_message(parse_HTTP_message(message)))
+
+# recibimos el mensaje (en bytes)
+#message = new_socket.recv(buff_size)
 
 # guardamos el resultado del mensaje
 
-result = parse_HTTP_message(message2)
-
-print(result[2])
+#print(create_HTTP_message(parse_HTTP_message(message.decode())))
 
 
 
@@ -183,4 +214,4 @@ print(result[2])
 #print(message.decode() == new_HTTP_message)
 
 # se cierra la conexión con el socket
-#new_socket.close()
+# new_socket.close()
