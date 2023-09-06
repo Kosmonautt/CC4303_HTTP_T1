@@ -69,7 +69,7 @@ HTML_message = '''<!DOCTYPE html>
 buff_size = 4
 
 # dirección del socket server
-server_adress = ('localhost', 8003)
+server_adress = ('localhost', 8001)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -92,8 +92,21 @@ recv_message = aux.read_full_HTTP_message(new_socket, buff_size)
 # guardamos el la request del buscador
 result = aux.parse_HTTP_message(recv_message.decode())
 
-# se crea el mensaje que se enviará al neavegador
-new_HTTP_message = aux.create_HTML_HTTP(HTML_message, name)
+# se crea el mensaje que se enviará al neavegador (sin el header personalizado)
+new_HTTP_message = aux.create_HTML_HTTP(HTML_message)
+
+# el mensaje se transofrma en una estrcutura
+structure = aux.parse_HTTP_message(new_HTTP_message)
+# json con atributos
+json = structure[1]
+# atributos del json
+atributes = json["atributos"][0]
+# se agrega el nombre a los atributos
+atributes["X-ElQuePregunta"] = name
+# se actualiza la estrcutura
+new_structure = (structure[0], json, structure[2], structure[3])
+# se actualiza el mensaje (ahora con el header personalizado)
+new_HTTP_message = aux.create_HTTP_message(new_structure)
 
 # se envía el mensaje al navegador
 new_socket.send(new_HTTP_message.encode())
