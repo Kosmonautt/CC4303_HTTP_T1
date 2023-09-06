@@ -35,7 +35,7 @@ new_socket, new_adress = server_socket.accept()
 # recibimos la request (en bytes)
 client_message = new_socket.recv(buff_size)
 
-# transformamos la rquest del cliente en algo maejable
+# transformamos la request del cliente en algo maejable
 client_request = aux.parse_HTTP_message(client_message.decode())
 
 # conseguimos la linea con la URL deseada
