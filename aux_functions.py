@@ -32,6 +32,9 @@ def parse_HTTP_message(http_message):
     # mensaje html (si es que tiene)
     html_message = ''
 
+    # dice si se leyó al menos la HEAD del mensaje HTTP
+    head_read = False
+
     i = 0
 
     while i < mssg_len:
@@ -48,6 +51,8 @@ def parse_HTTP_message(http_message):
             if http_message[i] == '\r':
                 # se avanza hasta el \n
                 i +=1
+                # se confirma que que se leyó todo el head
+                head_read = True
                 # si se llega al final del string, entonces no hay mensaje HTML
                 if i+1 == mssg_len:
                     break
@@ -100,7 +105,7 @@ def parse_HTTP_message(http_message):
     info_json = json.loads(info_json)
 
     # se retorna la primer línea y el json con los atributos
-    return (first_line, info_json, html_message) 
+    return (first_line, info_json, html_message, head_read) 
 
 # esta función toma la estructura y la retorna como un mensaje HTTP
 def create_HTTP_message(sctructure):
@@ -112,18 +117,18 @@ def create_HTTP_message(sctructure):
     HTML_message = sctructure[2]
     
     # mensaje HTTP, inicialmente vacío
-    HHTP_message = ''
+    HTTP_message = ''
 
-    HHTP_message += first_line + "\r\n"
+    HTTP_message += first_line + "\r\n"
 
     # atributos del json
     atributes = json["atributos"][0]
 
     for key, value in atributes.items():
-        HHTP_message += key + ": " + value + "\r\n"
+        HTTP_message += key + ": " + value + "\r\n"
     
     # última linea del HEAD
-    HHTP_message += "\r\n"
+    HTTP_message += "\r\n"
 
     # si tiene el atributo de content length
     if 'Content-Length' in atributes.keys():
@@ -131,10 +136,10 @@ def create_HTTP_message(sctructure):
         assert(int(atributes['Content-Length']) == len((HTML_message).encode()))
 
         # se concatena el mensaje
-        HHTP_message += HTML_message
+        HTTP_message += HTML_message
 
     # se retorna el mensaje final
-    return HHTP_message
+    return HTTP_message
 
 # esta función toma un texto HTML y crea un mensaje HTTP adecuado 
 def create_HTML_HTTP(HTML_message, name=None):
@@ -180,7 +185,54 @@ def create_HTML_HTTP(HTML_message, name=None):
     info_json = json.loads(info_json)
 
     # se crea la estrucutra
-    strcuture = (first_line, info_json, HTML_message)
+    strcuture = (first_line, info_json, HTML_message, True)
     
     # se retorna el mensaje ya creado
     return create_HTTP_message(strcuture)
+
+# función que verifica si un mensaje HTTP ha sido leído por completo
+def read_fully(message):
+    # se pasa a una escructura
+    structure = parse_HTTP_message(message)
+    # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
+
+    if(structure[3]):   # si se ha leaído todo el HEAD
+        # json con atributos
+        json = structure[1]
+        # atributos del json
+        atributes = json["atributos"][0]
+        # largo que indica el mensaje HTTP (en bytes)
+        largo_HTTP = int(atributes['Content-Length'])
+        # largo del mensaje real (en bytes)
+        largo_real = (structure[2]).encode()
+        # si los largos coinciden
+        if(largo_real >= largo_HTTP):
+            return True
+    else:
+        return False
+
+# función que recibe un mensaje HTTP completo
+def read_full_HTTP_message(connection_socket, buff_size):
+    # recibimos la primera parte del mensaje
+    recv_message = connection_socket.recv(buff_size)
+    full_message = recv_message
+
+    # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
+    is_end_of_message = read_fully(full_message.decode())
+
+    # entramos a un while para recibir el resto y seguimos esperando información
+    # mientras no esté leído por completo
+    while not is_end_of_message:
+        # recibimos un nuevo trozo del mensaje
+        recv_message = connection_socket.recv(buff_size)
+
+        # lo añadimos al mensaje "completo"
+        full_message += recv_message
+
+        # verificamos si es la última parte del mensaje
+        is_end_of_message = read_fully(full_message.decode())
+
+    # finalmente retornamos el mensaje
+    return full_message
+    
+        

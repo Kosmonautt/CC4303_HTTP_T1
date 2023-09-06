@@ -29,7 +29,7 @@ HTML_message = '''<!DOCTYPE html>
 buff_size = 1024
 
 # dirección del socket server
-server_adress = ('localhost', 8000)
+server_adress = ('localhost', 8001)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
