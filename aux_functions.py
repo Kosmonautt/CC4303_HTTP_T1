@@ -127,11 +127,13 @@ def create_HTTP_message(sctructure):
 
     # si tiene el atributo de content length
     if 'Content-Length' in atributes.keys():
-        # se saca el largo del mensaje en bytes
-        len_HTML = len(HTML_message)
-        # se recorre el mensaje
-        for i in range(0, len_HTML):
-            HHTP_message += HTML_message[i]
+        # se comprueba que el largo sea igual al del mensaje
+        assert(int(atributes['Content-Length']) == len((HTML_message).encode()))
+
+        # se concatena el mensaje
+        HHTP_message += HTML_message
+
+    # se retorna el mensaje final
     return HHTP_message
 
 # esta función toma un texto HTML y crea un mensaje HTTP adecuado 
