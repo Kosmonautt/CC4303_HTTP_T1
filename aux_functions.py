@@ -192,23 +192,31 @@ def create_HTML_HTTP(HTML_message, name=None):
 
 # función que verifica si un mensaje HTTP ha sido leído por completo
 def read_fully(message):
-    # se pasa a una escructura
-    structure = parse_HTTP_message(message)
-    # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
+    try:
+        # se pasa a una escructura
+        structure = parse_HTTP_message(message)
+        # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
 
-    if(structure[3]):   # si se ha leaído todo el HEAD
-        # json con atributos
-        json = structure[1]
-        # atributos del json
-        atributes = json["atributos"][0]
-        # largo que indica el mensaje HTTP (en bytes)
-        largo_HTTP = int(atributes['Content-Length'])
-        # largo del mensaje real (en bytes)
-        largo_real = (structure[2]).encode()
-        # si los largos coinciden
-        if(largo_real >= largo_HTTP):
-            return True
-    else:
+        if(structure[3]):   # si se ha leaído todo el HEAD
+            # json con atributos
+            json = structure[1]
+            # atributos del json
+            atributes = json["atributos"][0]
+            # si no hay mensaje HTTP
+            if not 'Content-Length' in atributes.keys():
+                # entonces ya se leyó todo el mensaje
+                return True
+            # largo que indica el mensaje HTTP (en bytes)
+            largo_HTTP = int(atributes['Content-Length'])
+            # largo del mensaje real (en bytes)
+            largo_real = (structure[2]).encode()
+            # si los largos coinciden
+            if(largo_real >= largo_HTTP):
+                return True
+        else:
+            return False
+    # si ocurre cualquier tipo de error entonces no tenía la forma apropiada
+    except:
         return False
 
 # función que recibe un mensaje HTTP completo
@@ -231,7 +239,6 @@ def read_full_HTTP_message(connection_socket, buff_size):
 
         # verificamos si es la última parte del mensaje
         is_end_of_message = read_fully(full_message.decode())
-
     # finalmente retornamos el mensaje
     return full_message
     
