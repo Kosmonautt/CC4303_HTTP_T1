@@ -182,6 +182,5 @@ def create_HTML_HTTP(HTML_message, name=None):
     # se crea la estrucutra
     strcuture = (first_line, info_json, HTML_message)
     
-
     # se retorna el mensaje ya creado
     return create_HTTP_message(strcuture)
