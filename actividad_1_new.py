@@ -14,10 +14,10 @@ with open(dir) as file:
     name = data['name']
 
 # tamaño del buffer del server
-buff_size = 1024
+buff_size = 4000
 
 # dirección del socket server
-server_adress = ('localhost', 8000)
+server_adress = ('localhost', 8001)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,7 +53,7 @@ socket_web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print(requested_url)
 
 # adress de la página web
-adress_web = ('example.com', 80)
+adress_web = ('cc4303.bachmann.cl', 80)
 
 # se conecta a la página web
 socket_web.connect(adress_web)

@@ -13,8 +13,14 @@ with open(dir) as file:
     # se obtiene el nombre
     name = data['name']
 
+# se abre el json con páginas y palabras prohibidas
+forbidden = None
+with open("json_actividad_http.json") as file:
+    # se manejan los datos
+    forbidden = json.load(file)
+
 # tamaño del buffer del server
-buff_size = 1024
+buff_size = 50
 
 # dirección del socket server
 server_adress = ('localhost', 8000)
@@ -32,26 +38,56 @@ server_socket.listen(1)
 # crea un nuevo socket 
 new_socket, new_adress = server_socket.accept()
 
-# recibimos el mensaje (en bytes)
-message = new_socket.recv(buff_size)
+# recibimos la request (en bytes)
+client_message = aux.read_full_HTTP_message(new_socket, buff_size)
 
-# se crea el mensaje HTML que será mostrado al cliente
-HTML_message = '''<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Página de prueba</title>
-</head>
-<body>
-    <h1>Hola, esta es una prueba de página para requests con sockets!</h1>
-</body>
-</html>'''
+# transformamos la request del cliente en algo maejable
+client_request = aux.parse_HTTP_message(client_message.decode())
 
-# se llama la función que crea el mensaje de respuesta a una request dado solo el HTML
-new_HTTP_message = aux.create_HTML_HTTP(HTML_message, name)
+# se obtiene el json con los atributos
+client_json = client_request[1]
 
-# mensaje que se envía al cliente 
-new_socket.send(new_HTTP_message.encode())
+# atributos del json
+client_atributes = client_json["atributos"][0]
+
+requested_url = client_atributes["Host"]
+
+# print(client_request[0])
+
+# # conseguimos la linea con la URL deseada
+# requested_url = client_request[0]
+# # se divide por los espacios en blanco
+# requested_url = requested_url.split()
+# # elegimos la linea después de get (la URL)
+# requested_url = requested_url[1]
+# # se "limpia"
+# requested_url = requested_url.strip()
+# # se elige lo que está después de "http://"
+# requested_url = requested_url[7:len(requested_url)]
+# # si hay un "/" al final, se borra
+# if requested_url[len(requested_url)-1] == "/":
+#     requested_url = requested_url[0:len(requested_url)-1]
+
+print(requested_url)
+
+# se crea un nuevo socket para conextarse con la página web
+socket_web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# adress de la página web
+adress_web = (requested_url, 80)
+
+# se conecta a la página web
+socket_web.connect(adress_web)
+
+# se envia la request del cliente
+socket_web.send(client_message)
+
+#respuesta de la página web
+#web_response_message = socket_web.recv(4000)
+web_response_message = aux.read_full_HTTP_message(socket_web, buff_size)
+
+# se envia la response al cliente
+new_socket.send(web_response_message)
 
 # se cierra la conexión con el socket
 new_socket.close()

@@ -224,6 +224,11 @@ def create_HTML_HTTP(HTML_message, name=None):
 #         return False
 def read_fully(message):
     try:
+        message = message.decode()
+    except:
+        return False
+
+    try:
         # se pasa a una escructura
         structure = parse_HTTP_message(message)
         # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
@@ -269,7 +274,7 @@ def read_full_HTTP_message(connection_socket, buff_size):
         full_message += recv_message
 
         # verificamos si es la última parte del mensaje
-        is_end_of_message = read_fully(full_message.decode())
+        is_end_of_message = read_fully(full_message)
 
     # finalmente retornamos el mensaje
     return full_message

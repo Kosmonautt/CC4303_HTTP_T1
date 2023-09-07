@@ -61,11 +61,9 @@ socket_web.connect(adress_web)
 # se envia la request del cliente
 socket_web.send(client_message)
 
-# # respuesta de la página web
+#respuesta de la página web
 #web_response_message = socket_web.recv(4000)
 web_response_message = aux.read_full_HTTP_message(socket_web, buff_size)
-
-#print(web_response_message.decode())
 
 # se envia la response al cliente
 new_socket.send(web_response_message)
