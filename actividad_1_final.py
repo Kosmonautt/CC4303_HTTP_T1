@@ -74,8 +74,7 @@ while True:
     # se "limpia"
     requested_url_full = requested_url_full.strip()
 
-    print("Sitio pedido:")
-    print(requested_url_full)
+    print("Sitio pedido: " + requested_url_full)
 
     # se checkea si la página está prohibida
     if requested_url_full in blocked_sites:
