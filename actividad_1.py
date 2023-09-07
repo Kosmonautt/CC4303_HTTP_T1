@@ -23,12 +23,14 @@ with open("json_actividad_http.json") as file:
 blocked_sites = json_forbidden["blocked"]
 # palabras prohibidas
 forbidden_words = json_forbidden["forbidden_words"]
+# correo del ususario
+user_email = json_forbidden["user"]
 
 # tamaño del buffer del server
 buff_size = 50
 
 # dirección del socket server
-server_adress = ('localhost', 8000)
+server_adress = ('localhost', 8001)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,7 +58,7 @@ client_json = client_request[1]
 client_atributes = client_json["atributos"][0]
 
 # se agrega el que pregunta (esto solo cambia la estructura, aún no se modifica el mensaje)
-client_atributes["X-ElQuePregunta"] = "Ksmnt"
+client_atributes["X-ElQuePregunta"] = user_email
 
 # la url del host del sitio que se pidió
 requested_url = client_atributes["Host"]
@@ -72,11 +74,27 @@ requested_url_full = requested_url_full.strip()
 
 # se checkea si la página está prohibida
 if requested_url_full in blocked_sites:
+    # HTML de error 
+    HTML_error = '''<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ERROR 403</title>
+</head>
+<body>
+    <h1>Je ne sais pas!</h1>
+</body>
+</html>'''
+
+    # mensaje con el mensaje HTTP con error
+    error_HTTP = aux.create_HTML_HTTP(HTML_error)
+
+
     # mensaje de error
-    error_message = "HTTP/1.1 403 Je ne sais pas!\r\n\r\n"
+    error_message = "HTTP/1.1 403 \r\n\r\n"
     
     # se envia la response al cliente
-    new_socket.send(error_message.encode())
+    new_socket.send(error_HTTP.encode())
 
     # se cierra la conexión con el socket
     new_socket.close()

@@ -148,7 +148,9 @@ def create_HTTP_message(sctructure):
 # esta función toma un texto HTML y crea un mensaje HTTP adecuado 
 def create_HTML_HTTP(HTML_message, name=None):
     # linea con POST
-    first_line = 'HTTP/1.1 200 OK'
+    #first_line = 'HTTP/1.1 200 OK'
+    first_line = 'HTTP/1.1 403 ERROR'
+
 
     # se saca el largo del HTML
     len_HTML = str(len(HTML_message.encode()))
@@ -194,34 +196,6 @@ def create_HTML_HTTP(HTML_message, name=None):
     # se retorna el mensaje ya creado
     return create_HTTP_message(strcuture)
 
-# función que verifica si un mensaje HTTP ha sido leído por completo
-# def read_fully(message):
-#     try:
-#         # se pasa a una escructura
-#         structure = parse_HTTP_message(message)
-#         # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
-
-#         if(structure[3]):   # si se ha leaído todo el HEAD
-#             # json con atributos
-#             json = structure[1]
-#             # atributos del json
-#             atributes = json["atributos"][0]
-#             # si no hay mensaje HTTP
-#             if not 'Content-Length' in atributes.keys():
-#                 # entonces ya se leyó todo el mensaje
-#                 return True
-#             # largo que indica el mensaje HTTP (en bytes)
-#             largo_HTTP = int(atributes['Content-Length'])
-#             # largo del mensaje real (en bytes)
-#             largo_real = (structure[2]).encode()
-#             # si los largos coinciden
-#             if(largo_real >= largo_HTTP):
-#                 return True
-#         else:
-#             return False
-#     # si ocurre cualquier tipo de error entonces no tenía la forma apropiada
-#     except:
-#         return False
 def read_fully(message):
     try:
         message = message.decode()
