@@ -14,10 +14,10 @@ with open(dir) as file:
     name = data['name']
 
 # tamaño del buffer del server
-buff_size = 4
+buff_size = 50
 
 # dirección del socket server
-server_adress = ('localhost', 8001)
+server_adress = ('localhost', 8000)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -62,10 +62,10 @@ socket_web.connect(adress_web)
 socket_web.send(client_message)
 
 # # respuesta de la página web
-web_response_message = socket_web.recv(4000)
-#web_response_message = aux.read_full_HTTP_message(socket_web, buff_size)
+#web_response_message = socket_web.recv(4000)
+web_response_message = aux.read_full_HTTP_message(socket_web, buff_size)
 
-print(web_response_message.decode())
+#print(web_response_message.decode())
 
 # se envia la response al cliente
 new_socket.send(web_response_message)

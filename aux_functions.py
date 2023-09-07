@@ -92,7 +92,7 @@ def parse_HTTP_message(http_message):
 
         # caso problemático debido a los "" presentes, no permite hacer el json.dump correctamente
         if(line_atribute=="Etag"):
-            line_atribute = line_atribute.replace('"','')
+            continue
 
         # se formatea el mensaje con forma de json
         if(i+1 == len_lines):
@@ -195,33 +195,60 @@ def create_HTML_HTTP(HTML_message, name=None):
     return create_HTTP_message(strcuture)
 
 # función que verifica si un mensaje HTTP ha sido leído por completo
+# def read_fully(message):
+#     try:
+#         # se pasa a una escructura
+#         structure = parse_HTTP_message(message)
+#         # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
+
+#         if(structure[3]):   # si se ha leaído todo el HEAD
+#             # json con atributos
+#             json = structure[1]
+#             # atributos del json
+#             atributes = json["atributos"][0]
+#             # si no hay mensaje HTTP
+#             if not 'Content-Length' in atributes.keys():
+#                 # entonces ya se leyó todo el mensaje
+#                 return True
+#             # largo que indica el mensaje HTTP (en bytes)
+#             largo_HTTP = int(atributes['Content-Length'])
+#             # largo del mensaje real (en bytes)
+#             largo_real = (structure[2]).encode()
+#             # si los largos coinciden
+#             if(largo_real >= largo_HTTP):
+#                 return True
+#         else:
+#             return False
+#     # si ocurre cualquier tipo de error entonces no tenía la forma apropiada
+#     except:
+#         return False
 def read_fully(message):
     try:
         # se pasa a una escructura
         structure = parse_HTTP_message(message)
         # verificamos si llegó el mensaje completo o si aún faltan partes del mensaje
-
-        if(structure[3]):   # si se ha leaído todo el HEAD
-            # json con atributos
-            json = structure[1]
-            # atributos del json
-            atributes = json["atributos"][0]
-            # si no hay mensaje HTTP
-            if not 'Content-Length' in atributes.keys():
-                # entonces ya se leyó todo el mensaje
-                return True
-            # largo que indica el mensaje HTTP (en bytes)
-            largo_HTTP = int(atributes['Content-Length'])
-            # largo del mensaje real (en bytes)
-            largo_real = (structure[2]).encode()
-            # si los largos coinciden
-            if(largo_real >= largo_HTTP):
-                return True
-        else:
-            return False
-    # si ocurre cualquier tipo de error entonces no tenía la forma apropiada
     except:
         return False
+
+    if(structure[3]):   # si se ha leaído todo el HEAD
+        # json con atributos
+        json = structure[1]
+        # atributos del json
+        atributes = json["atributos"][0]
+        # si no hay mensaje HTTP
+        if not 'Content-Length' in atributes.keys():
+            # entonces ya se leyó todo el mensaje
+            return True
+        # largo que indica el mensaje HTTP (en bytes)
+        largo_HTTP = int(atributes['Content-Length'])
+        # largo del mensaje real (en bytes)
+        largo_real = len((structure[2]).encode())
+        # si los largos coinciden
+        if(largo_real >= largo_HTTP):
+            return True
+    else:
+        return False
+
 
 # función que recibe un mensaje HTTP completo
 def read_full_HTTP_message(connection_socket, buff_size):
