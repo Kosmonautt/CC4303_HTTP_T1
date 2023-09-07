@@ -90,6 +90,10 @@ def parse_HTTP_message(http_message):
         line_atribute = divided_by_colon[0]
         line_content = divided_by_colon[1].strip()
 
+        # caso problemático debido a los "" presentes, no permite hacer el json.dump correctamente
+        if(line_atribute=="Etag"):
+            line_atribute = line_atribute.replace('"','')
+
         # se formatea el mensaje con forma de json
         if(i+1 == len_lines):
             line_string = '"' + line_atribute + '":"' + line_content + '"\n'
@@ -239,6 +243,7 @@ def read_full_HTTP_message(connection_socket, buff_size):
 
         # verificamos si es la última parte del mensaje
         is_end_of_message = read_fully(full_message.decode())
+
     # finalmente retornamos el mensaje
     return full_message
     
