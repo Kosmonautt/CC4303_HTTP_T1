@@ -28,7 +28,7 @@ forbidden_words = json_forbidden["forbidden_words"]
 buff_size = 50
 
 # dirección del socket server
-server_adress = ('localhost', 8002)
+server_adress = ('localhost', 8000)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -72,7 +72,14 @@ requested_url_full = requested_url_full.strip()
 
 # se checkea si la página está prohibida
 if requested_url_full in blocked_sites:
-    pass
+    # mensaje de error
+    error_message = "HTTP/1.1 403 Je ne sais pas!\r\n\r\n"
+    
+    # se envia la response al cliente
+    new_socket.send(error_message.encode())
+
+    # se cierra la conexión con el socket
+    new_socket.close()
 
 else:
     # se crea un nuevo socket para conextarse con la página web
@@ -93,8 +100,30 @@ else:
     socket_web.send(client_message)
 
     #respuesta de la página web
-    #web_response_message = socket_web.recv(4000)
     web_response_message = aux.read_full_HTTP_message(socket_web, buff_size)
+
+    # se transoforma el mensaje en una estrcutura
+    structure_response_message = aux.parse_HTTP_message(web_response_message.decode())
+    # se obtiene su HTML asociado
+    web_HTML = structure_response_message[2]
+    # se reemplazan las palabras prohibidas
+    for t in forbidden_words:
+        for key, value in t.items():
+            if key in web_HTML:
+                web_HTML = web_HTML.replace(key,value)
+    
+    # se obtiene el json con los atributos
+    web_response_message_json = structure_response_message[1]
+    # atributos del json
+    web_response_message_atributes = web_response_message_json["atributos"][0]
+    # se cambia el largo del mensaje para que se pueda leer entero
+    web_response_message_atributes["Content-Length"] = str(len(web_HTML.encode()))
+
+    # se crea una nueva estructra HTTP con el HTML censurado y el nuevo largo
+    new_structure_response_message = (structure_response_message[0],web_response_message_json,web_HTML,structure_response_message[2],structure_response_message[3])
+    
+    # se transforma de estrcutrua a mensaje 
+    web_response_message = (aux.create_HTTP_message(new_structure_response_message)).encode()
 
     # se envia la response al cliente
     new_socket.send(web_response_message)
