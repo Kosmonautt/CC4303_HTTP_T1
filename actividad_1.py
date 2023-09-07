@@ -30,7 +30,7 @@ user_email = json_forbidden["user"]
 buff_size = 50
 
 # dirección del socket server
-server_adress = ('localhost', 8001)
+server_adress = ('localhost', 8000)
 
 # se crea el server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,6 +74,8 @@ requested_url_full = requested_url_full.strip()
 
 # se checkea si la página está prohibida
 if requested_url_full in blocked_sites:
+    print("PROHIBIDO")
+
     # HTML de error 
     HTML_error = '''<!DOCTYPE html>
 <html lang="es">
@@ -100,6 +102,7 @@ if requested_url_full in blocked_sites:
     new_socket.close()
 
 else:
+    print("NO PROHIBIDO")
     # se crea un nuevo socket para conextarse con la página web
     socket_web = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
